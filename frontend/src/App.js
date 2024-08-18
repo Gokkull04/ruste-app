@@ -1,27 +1,21 @@
-import React, { useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import HomePage from './components/HomePage';
-import LoginPage from './components/LoginPage';
-import SignupPage from './components/SignupPage';
-import NotesPage from './components/NotesPage';
-import ProfilePage from './components/ProfilePage';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import HomePage from './pages/Homepage'
+import LoginPage from './pages/LoginPage'; // Assuming you have a LoginPage component
 
 const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState({});
-
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Navbar isAuthenticated={isAuthenticated} />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage setIsAuthenticated={setIsAuthenticated} />} />
-        <Route path="/signup" element={<SignupPage setIsAuthenticated={setIsAuthenticated} />} />
-        <Route path="/notes" element={<NotesPage />} />
-        <Route path="/profile" element={<ProfilePage user={user} setUser={setUser} setIsAuthenticated={setIsAuthenticated} />} />
-      </Routes>
-    </div>
+    <Router>
+      <div className="App">
+        <Routes>
+          {/* Route for Home Page */}
+          <Route path="/" element={<HomePage />} />
+
+          {/* Route for Login Page */}
+          <Route path="/login" element={<LoginPage />} />
+        </Routes>
+      </div>
+    </Router>
   );
 };
 

@@ -1,23 +1,19 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 
-const Navbar = ({ isAuthenticated }) => {
+const NavBar = () => {
   return (
-    <nav className="bg-blue-600 text-white p-4 flex justify-between">
-      <Link to="/" className="text-2xl font-bold">Reste</Link>
-      <div>
-        <Link to="/" className="mx-2">Home</Link>
-        {isAuthenticated ? (
-          <>
-            <Link to="/profile" className="mx-2">Profile</Link>
-            <Link to="/notes" className="mx-2">Notes</Link>
-          </>
-        ) : (
-          <Link to="/login" className="mx-2">Login</Link>
-        )}
+    <nav className="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 p-4 shadow-lg">
+      <div className="container mx-auto flex justify-between items-center">
+        <div className="text-white text-2xl font-bold">
+          RustE
+        </div>
+        <div className="space-x-4">
+          <a href="/" className="text-white hover:text-gray-200">Home</a>
+          <a href="/login" className="text-white hover:text-gray-200">Login</a>
+        </div>
       </div>
     </nav>
   );
 };
 
-export default Navbar;
+export default NavBar;
