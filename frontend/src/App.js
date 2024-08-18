@@ -2,17 +2,18 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/Homepage'
 import LoginPage from './pages/LoginPage'; // Assuming you have a LoginPage component
+import SignupPage from './pages/SignupPage';
+import ForgotPasswordPage from './pages/Forgotpassword';
 
 const App = () => {
   return (
     <Router>
       <div className="App">
         <Routes>
-          {/* Route for Home Page */}
           <Route path="/" element={<HomePage />} />
-
-          {/* Route for Login Page */}
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage/>} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         </Routes>
       </div>
     </Router>
