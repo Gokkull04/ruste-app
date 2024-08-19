@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import NavBar from '../components/Navbar';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import './NotesPage.css'; // Import the custom CSS if needed
 
 const NotesPage = () => {
   const [eventName, setEventName] = useState('');

@@ -1,30 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NavBar from '../components/Navbar';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import TimePicker from 'react-time-picker';
-import './NotesPage.css'; // Import the custom CSS for styling the time picker
+import axios from 'axios';
 
 const NotesPage = () => {
   const [eventName, setEventName] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState('10:00');
   const [alertMessage, setAlertMessage] = useState('');
+  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    // Fetch events on component mount
+    axios.get('http://localhost:5000/events')
+      .then(response => {
+        setEvents(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching events:', error);
+      });
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Event Name:', eventName);
-    console.log('Selected Date:', selectedDate);
-    console.log('Selected Time:', selectedTime);
-    setAlertMessage('Event details submitted successfully!');
+  
+    const eventDetails = {
+      eventName,
+      eventDate: selectedDate,
+      eventTime: selectedTime,
+    };
+  
+    console.log('Event details:', eventDetails); // Log the event details being sent
+  
+    axios.post('http://localhost:5000/events', eventDetails)
+      .then(response => {
+        setAlertMessage('Event details submitted successfully!');
+        setEvents([...events, eventDetails]); // Update the events list with the new event
+      })
+      .catch(error => {
+        console.error('Error submitting event details:', error.response.data); // Log the error details
+        setAlertMessage('Failed to submit event details.');
+      });
+  
+    // Clear form fields
+    setEventName('');
+    setSelectedDate(new Date());
+    setSelectedTime('10:00');
   };
+  
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navbar */}
       <NavBar />
 
-      {/* Notes Form */}
       <div className="flex-grow flex items-center justify-center">
         <div className="w-full max-w-md bg-white bg-opacity-10 rounded-lg shadow-lg p-8">
           <h2 className="text-3xl font-bold text-center mb-6 drop-shadow-lg">
@@ -64,32 +93,40 @@ const NotesPage = () => {
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm font-bold mb-2 ">
+              <label className="block text-sm font-bold mb-2">
                 Time
               </label>
-              <TimePicker
-                onChange={setSelectedTime}
+              <input
+                type="time"
+                id="event-time"
                 value={selectedTime}
-                className="w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 bg-white text-gray-800 custom-time-picker"
+                onChange={(e) => setSelectedTime(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 bg-white text-gray-800"
               />
             </div>
 
-            <button
-              type="submit"
-              className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white font-bold py-2 px-4 rounded-lg focus:outline-none hover:bg-purple-700"
-            >
-              Submit
-            </button>
+            <div className="flex justify-center">
+              <button
+                type="submit"
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              >
+                Submit
+              </button>
+            </div>
           </form>
+
+          <div className="mt-6">
+            <h3 className="text-lg font-bold text-center mb-4">Upcoming Events</h3>
+            <ul>
+              {events.map((event, index) => (
+                <li key={index} className="mb-2">
+                  <strong>{event.eventName}</strong> - {new Date(event.eventDate).toLocaleDateString()} at {event.eventTime}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-4">
-        <div className="container mx-auto text-center">
-          &copy; {new Date().getFullYear()} RustE. All rights reserved.
-        </div>
-      </footer>
     </div>
   );
 };

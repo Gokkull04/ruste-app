@@ -29,6 +29,15 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
+// Event schema and model
+const eventSchema = new mongoose.Schema({
+  eventName: { type: String, required: true },
+  eventDate: { type: Date, required: true },
+  eventTime: { type: String, required: true },
+});
+
+const Event = mongoose.model('Event', eventSchema);
+
 // Signup route
 app.post('/signup', async (req, res) => {
   const { name, email, password } = req.body;
@@ -122,6 +131,40 @@ app.post('/update-password', async (req, res) => {
   }
 });
 
+// Create Event route
+app.post('/events', async (req, res) => {
+  const { eventName, eventDate, eventTime } = req.body;
+
+  try {
+    if (!eventName || !eventDate || !eventTime) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    const newEvent = new Event({
+      eventName,
+      eventDate,
+      eventTime,
+    });
+
+    await newEvent.save();
+    res.status(201).json({ message: 'Event created successfully' });
+  } catch (err) {
+    console.error('Error creating event:', err.message); // Log the specific error message
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+
+// Get Events route
+app.get('/events', async (req, res) => {
+  try {
+    const events = await Event.find();
+    res.status(200).json(events);
+  } catch (err) {
+    console.error('Error fetching events:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

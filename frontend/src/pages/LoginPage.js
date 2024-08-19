@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useAuth } from '../components/AuthProvider';
 import NavBar from '../components/Navbar';
 
 const LoginPage = () => {
@@ -8,6 +9,7 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate(); // Initialize useNavigate
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,7 +31,8 @@ const LoginPage = () => {
           setSuccess(data.message);
           setError('');
           // Redirect to the notes page after successful login
-          navigate('/notes'); // Navigate to the notes page
+          login();
+          navigate('/profile');// Navigate to the notes page
         } else {
           setError(data.message || 'Something went wrong');
           setSuccess('');
