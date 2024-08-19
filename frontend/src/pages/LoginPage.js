@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import NavBar from '../components/Navbar';
 
 const LoginPage = () => {
@@ -6,12 +7,13 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:5000/login', { // Updated endpoint
+      const response = await fetch('http://localhost:5000/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -26,8 +28,8 @@ const LoginPage = () => {
         if (response.ok) {
           setSuccess(data.message);
           setError('');
-          // Optionally redirect after successful login
-          // window.location.href = '/home';
+          // Redirect to the notes page after successful login
+          navigate('/notes'); // Navigate to the notes page
         } else {
           setError(data.message || 'Something went wrong');
           setSuccess('');

@@ -20,7 +20,7 @@ mongoose.connect(MONGO_URI, {
 }).then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-// User schema and model without forgot password fields
+// User schema and model
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
@@ -78,6 +78,50 @@ app.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+// Forgot Password route
+app.post('/forgot-password', async (req, res) => {
+  const { name, email } = req.body;
+
+  try {
+    // Check if user exists
+    const user = await User.findOne({ name, email });
+    if (!user) {
+      return res.status(400).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({ message: 'User verified, proceed to set a new password' });
+  } catch (err) {
+    console.error('Error during forgot password:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Update Password route
+app.post('/update-password', async (req, res) => {
+  const { name, email, newPassword } = req.body;
+
+  try {
+    // Check if user exists
+    const user = await User.findOne({ name, email });
+    if (!user) {
+      return res.status(400).json({ message: 'User not found' });
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update user's password
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({ message: 'Password updated successfully' });
+  } catch (err) {
+    console.error('Error updating password:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

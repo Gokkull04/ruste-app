@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import NavBar from '../components/Navbar';
 
 const SignupPage = () => {
@@ -7,6 +8,7 @@ const SignupPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,8 +29,7 @@ const SignupPage = () => {
         if (response.ok) {
           setSuccess(data.message);
           setError('');
-          // Optionally redirect after successful signup
-          // window.location.href = '/login';
+          navigate('/notes'); // Redirect to the notes page after successful signup
         } else {
           setError(data.message || 'Something went wrong');
           setSuccess('');

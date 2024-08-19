@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import NavBar from '../components/Navbar';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import './NotesPage.css'; // Import the custom CSS if needed
+import TimePicker from 'react-time-picker';
+import './NotesPage.css'; // Import the custom CSS for styling the time picker
 
 const NotesPage = () => {
   const [eventName, setEventName] = useState('');
@@ -63,16 +64,13 @@ const NotesPage = () => {
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm font-bold mb-2">
+              <label className="block text-sm font-bold mb-2 ">
                 Time
               </label>
-              <input
-                type="time"
-                id="event-time"
+              <TimePicker
+                onChange={setSelectedTime}
                 value={selectedTime}
-                onChange={(e) => setSelectedTime(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 bg-white text-gray-800"
-                step="1"
+                className="w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 bg-white text-gray-800 custom-time-picker"
               />
             </div>
 
