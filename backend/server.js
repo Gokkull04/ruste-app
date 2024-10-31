@@ -1,8 +1,8 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const bcrypt = require('bcryptjs');
-const dotenv = require('dotenv');
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const bcrypt = require("bcryptjs");
+const dotenv = require("dotenv");
 
 dotenv.config();
 
@@ -14,155 +14,161 @@ const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
 // Connect to MongoDB
-mongoose.connect(MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+mongoose
+  .connect(MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("MongoDB connection error:", err));
 
 // User schema and model
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  notes: [
+    {
+      eventName: { type: String, required: true },
+      eventDate: { type: Date, required: true },
+      eventTime: { type: String, required: true },
+      createdAt: { type: Date, default: Date.now },
+    },
+  ],
 });
 
-const User = mongoose.model('User', userSchema);
-
-// Event schema and model
-const eventSchema = new mongoose.Schema({
-  eventName: { type: String, required: true },
-  eventDate: { type: Date, required: true },
-  eventTime: { type: String, required: true },
-});
-
-const Event = mongoose.model('Event', eventSchema);
+const User = mongoose.model("User", userSchema);
 
 // Signup route
-app.post('/signup', async (req, res) => {
+app.post("/signup", async (req, res) => {
   const { name, email, password } = req.body;
 
   try {
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
+      return res.status(400).json({ message: "User already exists" });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create new user
     const newUser = new User({ name, email, password: hashedPassword });
     await newUser.save();
 
-    res.status(201).json({ message: 'User created successfully' });
+    res.status(201).json({ message: "User created successfully" });
   } catch (err) {
-    console.error('Error during signup:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error during signup:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
-// Login route
-app.post('/login', async (req, res) => {
+// Login route (basic authentication)
+app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // Success
-    res.status(200).json({ message: 'Login successful' });
+    res.status(200).json({ message: "Login successful", email });
   } catch (err) {
-    console.error('Error during login:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error during login:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
-// Forgot Password route
-app.post('/forgot-password', async (req, res) => {
-  const { name, email } = req.body;
+// Add a note for a specific user
+// POST /profile/notes route
+app.post('/profile/notes', async (req, res) => {
+  const { email, eventName, eventDate, eventTime } = req.body;
+  if (!email || !eventName || !eventDate || !eventTime) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
 
   try {
-    // Check if user exists
-    const user = await User.findOne({ name, email });
-    if (!user) {
-      return res.status(400).json({ message: 'User not found' });
-    }
-
-    res.status(200).json({ message: 'User verified, proceed to set a new password' });
-  } catch (err) {
-    console.error('Error during forgot password:', err);
-    res.status(500).json({ message: 'Server error' });
+    const newNote = { email, eventName, eventDate, eventTime, createdAt: new Date() };
+    // Insert the note into your database
+    const result = await Note.create(newNote); // adjust this to your database method
+    res.status(201).json(result);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to add note' });
   }
 });
 
-// Update Password route
-app.post('/update-password', async (req, res) => {
-  const { name, email, newPassword } = req.body;
+
+// Get notes for a specific user
+app.get("/profile/notes", async (req, res) => {
+  const { email } = req.query;
 
   try {
-    // Check if user exists
-    const user = await User.findOne({ name, email });
+    const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: 'User not found' });
+      return res.status(400).json({ message: "User not found" });
     }
 
-    // Hash the new password
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    res.status(200).json(user.notes);
+  } catch (err) {
+    console.error("Error fetching notes:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
-    // Update user's password
-    user.password = hashedPassword;
+// Update a specific note
+app.put("/profile/notes/:noteId", async (req, res) => {
+  const { email, eventName, eventDate, eventTime } = req.body;
+  const { noteId } = req.params;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    const note = user.notes.id(noteId);
+    if (!note) {
+      return res.status(404).json({ message: "Note not found" });
+    }
+
+    note.eventName = eventName;
+    note.eventDate = eventDate;
+    note.eventTime = eventTime;
     await user.save();
 
-    res.status(200).json({ message: 'Password updated successfully' });
+    res.status(200).json({ message: "Note updated successfully" });
   } catch (err) {
-    console.error('Error updating password:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error updating note:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
-// Create Event route
-app.post('/events', async (req, res) => {
-  const { eventName, eventDate, eventTime } = req.body;
+// Delete a specific note
+app.delete("/profile/notes/:noteId", async (req, res) => {
+  const { email } = req.body;
+  const { noteId } = req.params;
 
   try {
-    if (!eventName || !eventDate || !eventTime) {
-      return res.status(400).json({ message: 'All fields are required' });
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
     }
 
-    const newEvent = new Event({
-      eventName,
-      eventDate,
-      eventTime,
-    });
+    const note = user.notes.id(noteId);
+    if (!note) {
+      return res.status(404).json({ message: "Note not found" });
+    }
 
-    await newEvent.save();
-    res.status(201).json({ message: 'Event created successfully' });
+    note.remove();
+    await user.save();
+
+    res.status(200).json({ message: "Note deleted successfully" });
   } catch (err) {
-    console.error('Error creating event:', err.message); // Log the specific error message
-    res.status(500).json({ message: 'Server error', error: err.message });
-  }
-});
-
-
-// Get Events route
-app.get('/events', async (req, res) => {
-  try {
-    const events = await Event.find();
-    res.status(200).json(events);
-  } catch (err) {
-    console.error('Error fetching events:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error deleting note:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 

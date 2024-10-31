@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import Footer from "./components/Footer"; // Import the Footer component
+import Footer from "./components/Footer";
 import HomePage from "./pages/Homepage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import ForgotPasswordPage from "./pages/Forgotpassword";
 import NotesPage from "./pages/NotesPage";
+import Profile from "./pages/ProfilePage";
+
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -31,6 +33,7 @@ function App() {
               path="/signup"
               element={<SignupPage setIsLoggedIn={setIsLoggedIn} />}
             />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/notes" element={<NotesPage />} />
           </Routes>
