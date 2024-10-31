@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import NavBar from '../components/Navbar';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
@@ -19,8 +18,6 @@ const NotesPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navbar */}
-      <NavBar />
 
       {/* Notes Form */}
       <div className="flex-grow flex items-center justify-center">
@@ -85,12 +82,7 @@ const NotesPage = () => {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-4">
-        <div className="container mx-auto text-center">
-          &copy; {new Date().getFullYear()} RustE. All rights reserved.
-        </div>
-      </footer>
+      
     </div>
   );
 };

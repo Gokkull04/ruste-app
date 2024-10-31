@@ -1,83 +1,52 @@
-import React, { useState, useEffect } from "react";
+// Navbar.js
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 
-const Navbar = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await axios.get("/api/auth/check-auth", {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
-        setIsLoggedIn(response.data.success);
-      } catch (error) {
-        setIsLoggedIn(false);
-      }
-    };
-    checkAuth();
-  }, []);
-
-  const handleLogout = async () => {
-    try {
-      await axios.post("/api/auth/logout");
-      localStorage.removeItem("token");
-      setIsLoggedIn(false);
-      navigate("/login");
-    } catch (error) {
-      console.error("Logout failed", error);
-    }
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
+    navigate("/login");
   };
 
   return (
-    <nav className="bg-teal-600 text-white py-4 px-6 flex items-center justify-between">
-      <div className="text-2xl font-bold">RustE</div>
-      <div>
-        <ul className="flex space-x-4">
-          <li>
-            <Link to="/" className="hover:text-gray-300">
-              Home
-            </Link>
-          </li>
-          <li>
-            <Link to="/about" className="hover:text-gray-300">
-              About
-            </Link>
-          </li>
-        </ul>
-      </div>
-      <div>
-        <ul className="flex space-x-4">
+    <nav className="bg-gray-800 p-4">
+      <div className="container mx-auto flex justify-between items-center">
+        <Link to="/" className="text-white text-lg font-semibold">
+          RustE
+        </Link>
+        <div className="space-x-4">
+          <Link to="/" className="text-white">
+            Home
+          </Link>
+          <Link to="/about" className="text-white">
+            About
+          </Link>
           {isLoggedIn ? (
             <>
-              <li>
-                <Link to="/dashboard" className="hover:text-gray-300">
-                  Dashboard
-                </Link>
-              </li>
-              <li>
-                <button onClick={handleLogout} className="hover:text-gray-300">
-                  Logout
-                </button>
-              </li>
+              <Link to="/profile" className="text-white">
+                Profile
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="text-white bg-red-500 px-3 py-1 rounded"
+              >
+                Logout
+              </button>
             </>
           ) : (
             <>
-              <li>
-                <Link to="/login" className="hover:text-gray-300">
-                  Login
-                </Link>
-              </li>
-              <li>
-                <Link to="/signup" className="hover:text-gray-300">
-                  Signup
-                </Link>
-              </li>
+              <Link to="/login" className="text-white">
+                Login
+              </Link>
+              <Link to="/signup" className="text-white">
+                Signup
+              </Link>
             </>
           )}
-        </ul>
+        </div>
       </div>
     </nav>
   );

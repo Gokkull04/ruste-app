@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import NavBar from '../components/Navbar';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
@@ -52,7 +51,6 @@ const NotesPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <NavBar />
 
       <div className="flex-grow flex items-center justify-center">
         <div className="w-full max-w-md bg-white bg-opacity-10 rounded-lg shadow-lg p-8">

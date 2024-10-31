@@ -1,11 +1,8 @@
 import React from 'react';
-import NavBar from '../components/Navbar';
 
 const HomePage = () => {
   return (
     <div className="min-h-screen flex flex-col ">
-      {/* Navbar */}
-      <NavBar />
 
       {/* About Section */}
       <main className="flex-grow">
@@ -22,12 +19,7 @@ const HomePage = () => {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-4">
-        <div className="container mx-auto text-center">
-          &copy; {new Date().getFullYear()} RustE. All rights reserved.
-        </div>
-      </footer>
+      
     </div>
   );
 };
